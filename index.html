@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENIOLA — Property Presentation Specialist</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #0f0f0f;
+  --acid: #C8F135;
+  --acid-dim: rgba(200,241,53,0.12);
+  --acid-glow: rgba(200,241,53,0.06);
+  --white: #F0EDE6;
+  --muted: #555550;
+  --border: rgba(200,241,53,0.15);
+  --red: #FF3B3B;
+  --mono: 'Space Mono', monospace;
+  --display: 'Syne', sans-serif;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;cursor:none;}
+body{background:var(--bg);color:var(--white);font-family:var(--mono);overflow-x:hidden;min-height:100vh;}
+
+/* CUSTOM CURSOR */
+#cursor{position:fixed;width:10px;height:10px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,opacity .2s;mix-blend-mode:difference;}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid var(--acid);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .08s,width .2s,height .2s;opacity:0.5;}
+body:hover #cursor{opacity:1;}
+
+/* NOISE */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:900;opacity:0.4;}
+
+/* SCANLINE */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:901;}
+
+/* BOOT SCREEN */
+#boot{position:fixed;inset:0;background:#080808;z-index:990;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px;transition:opacity 0.8s ease;}
+#boot.done{opacity:0;pointer-events:none;}
+.boot-line{font-size:clamp(0.65rem,1vw,0.78rem);color:var(--acid);letter-spacing:0.08em;margin-bottom:6px;opacity:0;animation:bootIn 0.1s forwards;}
+.boot-line.dim{color:var(--muted);}
+.boot-bar{width:280px;height:2px;background:rgba(200,241,53,0.15);margin-top:24px;overflow:hidden;}
+.boot-progress{height:100%;background:var(--acid);width:0;animation:bootBar 2s ease forwards;}
+@keyframes bootIn{to{opacity:1;}}
+@keyframes bootBar{to{width:100%;}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(200,241,53,0.06);}
+.nav-id{font-family:var(--display);font-size:1rem;font-weight:800;letter-spacing:0.04em;color:var(--acid);}
+.nav-id span{color:var(--muted);font-weight:400;}
+.nav-status{display:flex;align-items:center;gap:12px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.nav-dot{width:6px;height:6px;background:var(--acid);border-radius:50%;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--acid);}
+
+/* TICKER */
+.ticker{position:fixed;bottom:0;left:0;right:0;z-index:100;border-top:1px solid var(--border);background:var(--bg);height:32px;overflow:hidden;display:flex;align-items:center;}
+.ticker-inner{display:flex;animation:tickerMove 30s linear infinite;white-space:nowrap;}
+.ticker-item{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);padding:0 40px;}
+.ticker-item span{color:var(--acid);}
+@keyframes tickerMove{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* HERO — SIGNAL INTERCEPT */
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;padding:120px 48px 80px;position:relative;overflow:hidden;align-items:center;gap:60px;}
+
+.hero-left{}
+.signal-tag{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--acid);margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+.signal-tag::before{content:'';width:20px;height:1px;background:var(--acid);}
+.hero-title{font-family:var(--display);font-size:clamp(3.5rem,7vw,7rem);font-weight:800;line-height:0.92;text-transform:uppercase;margin-bottom:32px;letter-spacing:-0.02em;}
+.hero-title .outline{-webkit-text-stroke:1px var(--white);color:transparent;}
+.hero-title .acid{color:var(--acid);}
+.hero-desc{font-size:0.75rem;line-height:2;color:var(--muted);max-width:400px;margin-bottom:48px;border-left:1px solid var(--border);padding-left:20px;}
+.hero-cta{display:inline-flex;align-items:center;gap:12px;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--bg);background:var(--acid);padding:14px 32px;text-decoration:none;transition:all 0.2s;font-family:var(--mono);}
+.hero-cta:hover{background:var(--white);transform:translate(2px,-2px);}
+
+.hero-right{position:relative;}
+.signal-display{border:1px solid var(--border);background:var(--surface);padding:32px;position:relative;overflow:hidden;}
+.signal-display::before{content:'SIGNAL ACTIVE';position:absolute;top:12px;right:16px;font-size:0.55rem;letter-spacing:0.2em;color:var(--acid);}
+.signal-wave{display:flex;align-items:center;gap:3px;margin-bottom:28px;}
+.wave-bar{width:3px;background:var(--acid);border-radius:1px;animation:wave 1.2s ease-in-out infinite;}
+.wave-bar:nth-child(1){height:8px;animation-delay:0s;}
+.wave-bar:nth-child(2){height:20px;animation-delay:.1s;}
+.wave-bar:nth-child(3){height:14px;animation-delay:.2s;}
+.wave-bar:nth-child(4){height:32px;animation-delay:.3s;}
+.wave-bar:nth-child(5){height:18px;animation-delay:.4s;}
+.wave-bar:nth-child(6){height:40px;animation-delay:.5s;}
+.wave-bar:nth-child(7){height:24px;animation-delay:.6s;}
+.wave-bar:nth-child(8){height:36px;animation-delay:.7s;}
+.wave-bar:nth-child(9){height:16px;animation-delay:.8s;}
+.wave-bar:nth-child(10){height:28px;animation-delay:.9s;}
+.wave-bar:nth-child(11){height:10px;animation-delay:1s;}
+.wave-bar:nth-child(12){height:22px;animation-delay:1.1s;}
+@keyframes wave{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.4);}}
+.signal-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);}
+.signal-stat{background:var(--surface);padding:20px;position:relative;}
+.signal-stat::before{content:attr(data-id);position:absolute;top:10px;right:12px;font-size:0.5rem;letter-spacing:0.1em;color:var(--muted);}
+.stat-val{font-family:var(--display);font-size:2rem;font-weight:800;color:var(--acid);line-height:1;margin-bottom:4px;}
+.stat-lbl{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.signal-log{margin-top:20px;max-height:120px;overflow:hidden;}
+.log-line{font-size:0.58rem;letter-spacing:0.05em;color:var(--muted);margin-bottom:4px;padding:4px 0;border-bottom:1px solid rgba(200,241,53,0.05);}
+.log-line .ts{color:rgba(200,241,53,0.4);margin-right:10px;}
+.log-line.active{color:var(--white);}
+.log-line .ok{color:var(--acid);}
+
+/* GRID RULE */
+.grid-rule{display:grid;grid-template-columns:repeat(12,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:0 48px;overflow:hidden;}
+.grid-cell{height:40px;border-right:1px solid var(--border);}
+.grid-cell:last-child{border-right:none;}
+.grid-cell.lit{background:var(--acid-glow);}
+
+/* ORIGIN LOG */
+#origin{padding:120px 48px;display:grid;grid-template-columns:1fr 2fr;gap:80px;align-items:start;}
+.section-num{font-size:0.58rem;letter-spacing:0.2em;color:var(--acid);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.section-num::before{content:'';width:16px;height:1px;background:var(--acid);}
+.section-heading{font-family:var(--display);font-size:clamp(2rem,4vw,3.5rem);font-weight:800;text-transform:uppercase;line-height:1;letter-spacing:-0.02em;}
+.section-heading .dim{color:var(--muted);}
+.origin-body{font-size:0.75rem;line-height:2.1;color:rgba(240,237,230,0.6);}
+.origin-body p+p{margin-top:24px;}
+.origin-body .highlight{color:var(--acid);font-style:italic;}
+.origin-quote{margin-top:40px;border-left:2px solid var(--acid);padding:20px 24px;background:var(--acid-glow);}
+.origin-quote p{font-family:var(--display);font-size:1.1rem;font-weight:700;line-height:1.4;color:var(--white);}
+.origin-timeline{margin-top:0;}
+.timeline-item{display:flex;gap:24px;margin-bottom:32px;position:relative;}
+.timeline-item::before{content:'';position:absolute;left:9px;top:24px;width:1px;height:calc(100% + 8px);background:var(--border);}
+.timeline-item:last-child::before{display:none;}
+.tl-dot{width:20px;height:20px;border:1px solid var(--acid);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.tl-dot::after{content:'';width:6px;height:6px;background:var(--acid);}
+.tl-content{}
+.tl-time{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.tl-title{font-family:var(--display);font-size:0.9rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;}
+.tl-desc{font-size:0.68rem;color:var(--muted);line-height:1.8;}
+
+/* ARTIFACTS (PROJECTS) */
+#artifacts{padding:80px 0 120px;}
+.artifacts-header{padding:0 48px;display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px;}
+.artifacts-count{font-size:0.6rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;}
+.artifact-row{display:grid;grid-template-columns:80px 1fr 1fr 1fr 140px;border-top:1px solid var(--border);transition:background 0.2s;}
+.artifact-row:last-child{border-bottom:1px solid var(--border);}
+.artifact-row:hover{background:var(--acid-glow);}
+.artifact-row:hover .artifact-num{color:var(--acid);}
+.artifact-row:hover .artifact-arrow{opacity:1;transform:translateX(0);}
+.artifact-cell{padding:28px 24px;font-size:0.68rem;border-right:1px solid var(--border);display:flex;align-items:center;}
+.artifact-cell:last-child{border-right:none;}
+.artifact-num{font-family:var(--display);font-size:1.8rem;font-weight:800;color:var(--muted);transition:color 0.2s;line-height:1;}
+.artifact-name{font-family:var(--display);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;display:flex;flex-direction:column;gap:6px;}
+.artifact-type{font-family:var(--mono);font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--acid);}
+.artifact-problem{font-size:0.65rem;line-height:1.8;color:var(--muted);max-width:280px;}
+.artifact-outcome{font-size:0.65rem;line-height:1.8;color:rgba(200,241,53,0.7);}
+.artifact-arrow{font-family:var(--display);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--acid);text-decoration:none;display:flex;align-items:center;gap:8px;opacity:0;transform:translateX(-8px);transition:all 0.3s;}
+.artifact-row:hover .artifact-arrow{opacity:1;transform:translateX(0);}
+.artifact-link{text-decoration:none;display:contents;cursor:none;}
+
+/* OS SECTION */
+#os{padding:120px 48px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.os-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-top:60px;align-items:start;}
+.os-principles{}
+.principle-item{margin-bottom:0;border-bottom:1px solid var(--border);padding:28px 0;}
+.principle-item:first-child{padding-top:0;}
+.principle-num{font-size:0.55rem;letter-spacing:0.2em;color:var(--acid);margin-bottom:10px;}
+.principle-title{font-family:var(--display);font-size:1rem;font-weight:700;text-transform:uppercase;margin-bottom:10px;}
+.principle-body{font-size:0.65rem;line-height:1.9;color:var(--muted);}
+.os-terminal{border:1px solid var(--border);background:var(--bg);}
+.terminal-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:8px;}
+.t-dot{width:10px;height:10px;border-radius:50%;}
+.t-dot.r{background:#FF5F57;}
+.t-dot.y{background:#FEBC2E;}
+.t-dot.g{background:#28C840;}
+.terminal-body{padding:24px;min-height:320px;}
+.t-line{font-size:0.65rem;line-height:1.9;margin-bottom:4px;}
+.t-line .prompt{color:var(--acid);}
+.t-line .cmd{color:var(--white);}
+.t-line .output{color:var(--muted);}
+.t-line .success{color:var(--acid);}
+.t-line .error{color:var(--red);}
+.t-cursor{display:inline-block;width:8px;height:14px;background:var(--acid);animation:blink 1s step-end infinite;vertical-align:middle;margin-left:4px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* COMMAND INPUT — the unexpected feature */
+#command-zone{padding:80px 48px;position:relative;}
+.cmd-title{font-family:var(--display);font-size:clamp(1.5rem,3vw,2.5rem);font-weight:800;text-transform:uppercase;margin-bottom:8px;}
+.cmd-sub{font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:32px;}
+.cmd-input-wrap{display:flex;align-items:center;gap:0;border:1px solid var(--border);background:var(--surface);transition:border-color 0.2s;}
+.cmd-input-wrap:focus-within{border-color:var(--acid);}
+.cmd-prefix{padding:16px 20px;font-size:0.75rem;color:var(--acid);border-right:1px solid var(--border);user-select:none;}
+#cmd-input{background:transparent;border:none;outline:none;padding:16px 20px;font-family:var(--mono);font-size:0.75rem;color:var(--white);flex:1;cursor:none;}
+#cmd-input::placeholder{color:var(--muted);}
+#cmd-response{margin-top:16px;padding:20px;border:1px solid var(--border);background:var(--bg);min-height:60px;font-size:0.7rem;line-height:1.9;color:var(--acid);display:none;}
+.cmd-hint{margin-top:12px;font-size:0.58rem;color:var(--muted);letter-spacing:0.1em;}
+.cmd-hint span{color:rgba(200,241,53,0.5);}
+
+/* CTA FINAL */
+#transmit{padding:120px 48px;display:grid;grid-template-columns:1.2fr 1fr;gap:80px;align-items:center;}
+.transmit-left .big-text{font-family:var(--display);font-size:clamp(3rem,6vw,6rem);font-weight:800;text-transform:uppercase;line-height:0.9;letter-spacing:-0.02em;margin-bottom:40px;}
+.transmit-left .big-text .outline{-webkit-text-stroke:1px rgba(240,237,230,0.3);color:transparent;}
+.transmit-left .big-text .acid{color:var(--acid);}
+.contact-items{}
+.contact-item{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--border);}
+.contact-label{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);}
+.contact-val{font-size:0.72rem;color:var(--white);text-decoration:none;transition:color 0.2s;}
+.contact-val:hover{color:var(--acid);}
+.whatsapp-block{margin-top:40px;background:var(--acid);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-decoration:none;transition:background 0.2s;}
+.whatsapp-block:hover{background:var(--white);}
+.wa-label{font-family:var(--display);font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--bg);letter-spacing:0.05em;}
+.wa-sub{font-size:0.6rem;color:rgba(8,8,8,0.6);letter-spacing:0.1em;margin-top:4px;}
+.wa-arrow{font-size:1.5rem;color:var(--bg);}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;}
+.footer-id{font-family:var(--display);font-size:0.8rem;font-weight:800;color:var(--acid);}
+.footer-copy{font-size:0.55rem;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;}
+.footer-coords{font-size:0.55rem;letter-spacing:0.08em;color:var(--muted);}
+
+/* SCROLL REVEAL */
+.sr{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.sr.in{opacity:1;transform:translateY(0);}
+.sr-delay-1{transition-delay:0.1s;}
+.sr-delay-2{transition-delay:0.2s;}
+.sr-delay-3{transition-delay:0.3s;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  #hero{grid-template-columns:1fr;padding:100px 24px 60px;}
+  .hero-right{display:none;}
+  #origin{grid-template-columns:1fr;gap:40px;padding:80px 24px;}
+  .artifact-row{grid-template-columns:50px 1fr 120px;}
+  .artifact-cell:nth-child(3),.artifact-cell:nth-child(4){display:none;}
+  #os{padding:80px 24px;}
+  .os-grid{grid-template-columns:1fr;gap:40px;}
+  #command-zone{padding:60px 24px;}
+  #transmit{grid-template-columns:1fr;gap:40px;padding:80px 24px;}
+  .transmit-left .big-text{font-size:clamp(2.5rem,10vw,4rem);}
+  nav{padding:16px 24px;}
+  .nav-links{display:none;}
+  .artifacts-header{padding:0 24px;}
+  footer{padding:20px 24px;flex-direction:column;gap:12px;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div class="boot-line dim" style="animation-delay:0.1s">ENIOLA_OS v2.4.1 — Property Presentation Interface</div>
+  <div class="boot-line dim" style="animation-delay:0.3s">Initializing display layer...</div>
+  <div class="boot-line" style="animation-delay:0.6s">Loading project artifacts... <span style="color:#555">[ 5 found ]</span></div>
+  <div class="boot-line dim" style="animation-delay:0.9s">Mounting signal array...</div>
+  <div class="boot-line" style="animation-delay:1.2s">Identity confirmed: <span style="color:#C8F135">PROPERTY PAGE SPECIALIST</span></div>
+  <div class="boot-line dim" style="animation-delay:1.5s">Building interface...</div>
+  <div class="boot-bar" style="animation-delay:0.6s"><div class="boot-progress"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-id">ENIOLA<span>/OS</span></div>
+  <ul class="nav-links">
+    <li><a href="#origin">Origin</a></li>
+    <li><a href="#artifacts">Artifacts</a></li>
+    <li><a href="#os">OS</a></li>
+    <li><a href="#transmit">Transmit</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="nav-dot"></div>
+    Signal Active
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">Property Pages <span>///</span> Lekki</span>
+    <span class="ticker-item">Shortlet Hosts <span>///</span> VI</span>
+    <span class="ticker-item">Estate Agents <span>///</span> Abuja</span>
+    <span class="ticker-item">Ikoyi <span>///</span> Maitama</span>
+    <span class="ticker-item">24hr Turnaround <span>///</span> Premium Output</span>
+    <span class="ticker-item">Listings That Convert <span>///</span> Signal OS</span>
+    <span class="ticker-item">Property Pages <span>///</span> Lekki</span>
+    <span class="ticker-item">Shortlet Hosts <span>///</span> VI</span>
+    <span class="ticker-item">Estate Agents <span>///</span> Abuja</span>
+    <span class="ticker-item">Ikoyi <span>///</span> Maitama</span>
+    <span class="ticker-item">24hr Turnaround <span>///</span> Premium Output</span>
+    <span class="ticker-item">Listings That Convert <span>///</span> Signal OS</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="signal-tag">Signal Intercepted — Property Layer</div>
+    <h1 class="hero-title">
+      <span class="outline">PAGES</span><br>
+      THAT<br>
+      <span class="acid">CLOSE.</span>
+    </h1>
+    <p class="hero-desc">
+      I don't build websites. I build dedicated property presentation pages that cut through the noise of portal links and WhatsApp forwards, and make serious buyers stop scrolling.
+    </p>
+    <a href="#artifacts" class="hero-cta">Scan Artifacts ↓</a>
+  </div>
+  <div class="hero-right sr">
+    <div class="signal-display">
+      <div class="signal-wave">
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      </div>
+      <div class="signal-stats">
+        <div class="signal-stat" data-id="[01]">
+          <div class="stat-val">5+</div>
+          <div class="stat-lbl">Projects deployed</div>
+        </div>
+        <div class="signal-stat" data-id="[02]">
+          <div class="stat-val">24h</div>
+          <div class="stat-lbl">Turnaround</div>
+        </div>
+        <div class="signal-stat" data-id="[03]">
+          <div class="stat-val">3×</div>
+          <div class="stat-lbl">More enquiries</div>
+        </div>
+        <div class="signal-stat" data-id="[04]">
+          <div class="stat-val">NG</div>
+          <div class="stat-lbl">Base location</div>
+        </div>
+      </div>
+      <div class="signal-log">
+        <div class="log-line active"><span class="ts">09:41:03</span>New listing received — Lekki Ph1 <span class="ok">[BUILT]</span></div>
+        <div class="log-line"><span class="ts">08:22:17</span>Page deployed — Maitama duplex <span class="ok">[LIVE]</span></div>
+        <div class="log-line"><span class="ts">07:05:44</span>Buyer enquiry via page link <span class="ok">[CONVERTED]</span></div>
+        <div class="log-line"><span class="ts">06:30:01</span>Agent retainer agreed — Lagos <span class="ok">[CLOSED]</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GRID RULE -->
+<div class="grid-rule">
+  <div class="grid-cell"></div><div class="grid-cell lit"></div><div class="grid-cell"></div>
+  <div class="grid-cell lit"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+  <div class="grid-cell lit"></div><div class="grid-cell"></div><div class="grid-cell lit"></div>
+  <div class="grid-cell"></div><div class="grid-cell lit"></div><div class="grid-cell"></div>
+</div>
+
+<!-- ORIGIN LOG -->
+<section id="origin" class="sr">
+  <div>
+    <div class="section-num">00 — Origin Log</div>
+    <h2 class="section-heading">WHO<br>SENT<br><span class="dim">THE</span><br>SIGNAL</h2>
+  </div>
+  <div>
+    <div class="origin-timeline">
+      <div class="timeline-item">
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-time">Observation</div>
+          <div class="tl-title">The Problem Was Obvious</div>
+          <div class="tl-desc">Every estate agent in Lagos was sending the same thing ; compressed WhatsApp photos, voice notes, portal links that looked identical to 50 other listings. Premium properties were being presented like classified ads.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-time">Insight</div>
+          <div class="tl-title">Buyers Decide in Seconds</div>
+          <div class="tl-desc">A serious buyer with real money doesn't chase agents. They move to the listing that communicates value fastest. The agent who presents better wins regardless of whether the property itself is better.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-time">Solution</div>
+          <div class="tl-title">One Link. Full Signal.</div>
+          <div class="tl-desc">I build a single, beautifully designed page per listing. Photos, details, location, amenities, pricing and a direct line to the agent. No middlemen. No portal noise. Just a signal that converts.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-time">Now</div>
+          <div class="tl-title">Building for Serious Agents</div>
+          <div class="tl-desc">I work with estate agents, shortlet hosts, and developers who understand that presentation is not a luxury , it is the difference between a listing that sits and a listing that sells.</div>
+        </div>
+      </div>
+    </div>
+    <div class="origin-quote sr sr-delay-2">
+      <p>"Every day your listing looks like everyone else's listing, is a day a serious buyer chose someone else."</p>
+    </div>
+  </div>
+</section>
+
+<!-- GRID RULE -->
+<div class="grid-rule">
+  <div class="grid-cell lit"></div><div class="grid-cell"></div><div class="grid-cell lit"></div>
+  <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell lit"></div>
+  <div class="grid-cell"></div><div class="grid-cell lit"></div><div class="grid-cell"></div>
+  <div class="grid-cell lit"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+</div>
+
+<!-- ARTIFACTS -->
+<section id="artifacts">
+  <div class="artifacts-header sr">
+    <div>
+      <div class="section-num">01 — Deployed Artifacts</div>
+      <h2 class="section-heading" style="font-size:clamp(2rem,4vw,3rem);">PROJECT<br>ARCHIVE</h2>
+    </div>
+    <div class="artifacts-count">05 artifacts / all live</div>
+  </div>
+
+  <!-- PROJECT ROWS — replace href="#" with your actual project links -->
+  <a class="artifact-link" href="https://eclatestates.github.io/Palm-Residences/" target="_blank">
+    <div class="artifact-row sr">
+      <div class="artifact-cell"><div class="artifact-num">01</div></div>
+      <div class="artifact-cell">
+        <div class="artifact-name">
+          <span class="artifact-type">Palm Jumeirah Frond G . Dubai</span>
+          Palm residences
+        </div>
+      </div>
+      <div class="artifact-cell"><div class="artifact-problem">Luxurious property losing interests of international buyer and investors. Buyers have to open another tab to calculate ROI.</div></div>
+      <div class="artifact-cell"><div class="artifact-outcome">→ Full property page with pricing tiers, amenities, WhatsApp booking, and location map. ROI calculator embedded.Direct leads go straight to the host.</div></div>
+      <div class="artifact-cell"><div class="artifact-arrow">View Artifact →</div></div>
+    </div>
+  </a>
+
+  <a class="artifact-link" href="https://eclatestates.github.io/Exclusive-Property/" target="_blank">
+    <div class="artifact-row sr sr-delay-1">
+      <div class="artifact-cell"><div class="artifact-num">02</div></div>
+      <div class="artifact-cell">
+        <div class="artifact-name">
+          <span class="artifact-type">Residential · Asokoro Main, Abuja</span>
+          Asokoro Estate Home
+        </div>
+      </div>
+      <div class="artifact-cell"><div class="artifact-problem">Agent sending buyers a 20-photo WhatsApp dump with no structure. Buyers asking the same questions repeatedly before agreeing to view.</div></div>
+      <div class="artifact-cell"><div class="artifact-outcome">→ Structured page eliminated back-and-forth. Buyers arrived at viewings already informed and pre-qualified.</div></div>
+      <div class="artifact-cell"><div class="artifact-arrow">View Artifact →</div></div>
+    </div>
+  </a>
+
+  <a class="artifact-link" href="https://eclatestates.github.io/4-BEDROOM-DUPLEX/" target="_blank">
+    <div class="artifact-row sr sr-delay-2">
+      <div class="artifact-cell"><div class="artifact-num">03</div></div>
+      <div class="artifact-cell">
+        <div class="artifact-name">
+          <span class="artifact-type">Residential · Lekki Phase 1</span>
+          Simple Touch Properties
+        </div>
+      </div>
+      <div class="artifact-cell"><div class="artifact-problem">Another listing with a wack presentation. Investor-level buyers not taking the listing seriously due to poor first impression.</div></div>
+      <div class="artifact-cell"><div class="artifact-outcome">→ Premium page with high-quality visuals, composed photos gallery, and investor-focused copy. Repositioned the listing entirely.</div></div>
+      <div class="artifact-cell"><div class="artifact-arrow">View Artifact →</div></div>
+    </div>
+  </a>
+
+  <a class="artifact-link" href="https://eclatestates.github.io/Enny-jiji/" target="_blank">
+    <div class="artifact-row sr sr-delay-3">
+      <div class="artifact-cell"><div class="artifact-num">04</div></div>
+      <div class="artifact-cell">
+        <div class="artifact-name">
+          <span class="artifact-type">Duplex · Ikoyi</span>
+          Parkview Duplex
+        </div>
+      </div>
+      <div class="artifact-cell"><div class="artifact-problem">High-value property in a premium location but the listing presentation didn't communicate the location premium at all.</div></div>
+      <div class="artifact-cell"><div class="artifact-outcome">→ Page built around location as the hero. Neighbourhood context, nearby landmarks, and compound layout drove serious buyer interest.</div></div>
+      <div class="artifact-cell"><div class="artifact-arrow">View Artifact →</div></div>
+    </div>
+  </a>
+
+</section>
+
+<!-- OS SECTION -->
+<section id="os" class="sr">
+  <div class="section-num">02 — Operating System</div>
+  <h2 class="section-heading">HOW I<br><span class="dim">THINK</span></h2>
+  <div class="os-grid">
+    <div class="os-principles">
+      <div class="principle-item">
+        <div class="principle-num">[PRINCIPLE_01]</div>
+        <div class="principle-title">Presentation is the product</div>
+        <div class="principle-body">The property exists before I touch it. What I change is how a buyer experiences it in the first 10 seconds. That experience determines whether they call or scroll past. I treat that 10 seconds as the entire job.</div>
+      </div>
+      <div class="principle-item">
+        <div class="principle-num">[PRINCIPLE_02]</div>
+        <div class="principle-title">Speed is part of the quality</div>
+        <div class="principle-body">A page delivered in 24 hours is more valuable than a perfect page delivered in a week. Agents need to move fast. I build systems that let me match their speed without compromising the output.</div>
+      </div>
+      <div class="principle-item">
+        <div class="principle-num">[PRINCIPLE_03]</div>
+        <div class="principle-title">Every page must earn its existence</div>
+        <div class="principle-body">I don't build pages for the sake of building pages. Every page I make has one goal — connect the right buyer to the right property faster than any other method would. If it doesn't do that, it has failed regardless of how it looks.</div>
+      </div>
+      <div class="principle-item">
+        <div class="principle-num">[PRINCIPLE_04]</div>
+        <div class="principle-title">The agent is not the audience</div>
+        <div class="principle-body">The agent is the client. The buyer is the audience. Every design decision I make is filtered through one question — does this make a buyer trust this property faster?</div>
+      </div>
+    </div>
+    <div class="os-terminal">
+      <div class="terminal-bar">
+        <div class="t-dot r"></div>
+        <div class="t-dot y"></div>
+        <div class="t-dot g"></div>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="prompt">signal@os:~$ </span><span class="cmd">run process --client=new_agent</span></div>
+        <div class="t-line"><span class="output">Initializing intake...</span></div>
+        <div class="t-line"><span class="output">Receiving listing details... <span class="success">done</span></span></div>
+        <div class="t-line"><span class="prompt">signal@os:~$ </span><span class="cmd">analyze --property-type --location</span></div>
+        <div class="t-line"><span class="output">Type: Residential duplex</span></div>
+        <div class="t-line"><span class="output">Location: Lekki Phase 1</span></div>
+        <div class="t-line"><span class="output">Target buyer: HNI, expatriate, corp exec</span></div>
+        <div class="t-line"><span class="success">Analysis complete.</span></div>
+        <div class="t-line"><span class="prompt">signal@os:~$ </span><span class="cmd">build --page --deploy --notify</span></div>
+        <div class="t-line"><span class="output">Building layout...</span></div>
+        <div class="t-line"><span class="output">Mounting photos... <span class="success">done</span></span></div>
+        <div class="t-line"><span class="output">Writing copy... <span class="success">done</span></span></div>
+        <div class="t-line"><span class="output">Setting up WhatsApp CTA...</span></div>
+        <div class="t-line"><span class="output">Deploying live link...</span></div>
+        <div class="t-line"><span class="success">✓ Page live. Signal transmitted. Agent notified.</span></div>
+        <div class="t-line"><span class="prompt">signal@os:~$ </span><span class="t-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMAND INPUT — unexpected interactive feature -->
+<section id="command-zone" class="sr">
+  <div class="section-num">03 — Direct Channel</div>
+  <h2 class="cmd-title">Run a Query</h2>
+  <p class="cmd-sub">Type a command below — try: <span style="color:var(--acid)">help</span>, <span style="color:var(--acid)">services</span>, <span style="color:var(--acid)">pricing</span>, <span style="color:var(--acid)">turnaround</span>, <span style="color:var(--acid)">contact</span></p>
+  <div class="cmd-input-wrap">
+    <span class="cmd-prefix">signal@portfolio:~$</span>
+    <input type="text" id="cmd-input" placeholder="type command... e.g services" autocomplete="off" spellcheck="false">
+  </div>
+  <div id="cmd-response"></div>
+  <p class="cmd-hint">Press <span>Enter</span> to execute</p>
+</section>
+
+<!-- TRANSMIT / CONTACT -->
+<section id="transmit">
+  <div class="transmit-left sr">
+    <div class="big-text">
+      LET'S<br>
+      <span class="outline">BUILD</span><br>
+      <span class="acid">YOUR</span><br>
+      <span class="outline">PAGE.</span>
+    </div>
+  </div>
+  <div class="sr sr-delay-1">
+    <div class="contact-items">
+      <div class="contact-item">
+        <span class="contact-label">WhatsApp</span>
+        <a href="https://wa.me/2349137114631" class="contact-val" target="_blank">+234 913 711 4631</a>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">Email</span>
+        <a href="mailto:yusufeniola883@gmail.com" class="contact-val">yusufeniola883@gmail.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">Base</span>
+        <span class="contact-val">Lagos, Nigeria</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">Turnaround</span>
+        <span class="contact-val">24 — 48 hours</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">First page</span>
+        <span class="contact-val" style="color:var(--acid)">Free for qualified agents</span>
+      </div>
+    </div>
+    <a href="https://wa.me/2349137114631?text=Hi,%20I%20found%20your%20portfolio%20and%20I%27m%20interested%20in%20a%20property%20page" class="whatsapp-block" target="_blank">
+      <div>
+        <div class="wa-label">Start on WhatsApp</div>
+        <div class="wa-sub">Typically responds within minutes</div>
+      </div>
+      <div class="wa-arrow">→</div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-id">SIGNAL/OS</div>
+  <div class="footer-copy">Property Presentation Specialist · Lagos</div>
+  <div class="footer-coords">6.4550° N, 3.3841° E</div>
+</footer>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button,[class*="artifact-row"],[class*="contact-val"]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.width='18px';cursor.style.height='18px';ring.style.width='50px';ring.style.height='50px';});
+  el.addEventListener('mouseleave',()=>{cursor.style.width='10px';cursor.style.height='10px';ring.style.width='36px';ring.style.height='36px';});
+});
+
+// BOOT
+setTimeout(()=>{document.getElementById('boot').classList.add('done');},2800);
+
+// SCROLL REVEAL
+const srs = document.querySelectorAll('.sr');
+const srObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
+},{threshold:0.08});
+srs.forEach(el=>srObs.observe(el));
+
+// COMMAND INPUT
+const commands = {
+  help: `Available commands:\n  services     — What I offer\n  pricing      — Cost breakdown\n  turnaround   — Delivery time\n  contact      — How to reach me\n  why          — Why property pages work\n  clear        — Clear output`,
+  services: `SIGNAL services:\n  [01] Single property page       — Full design, mobile-optimised, 24hr delivery\n  [02] Bundle (3 pages)            — Best value for active agents\n  [03] Monthly retainer            — Every listing gets a page, recurring\n  [04] Shortlet host pages         — Booking-focused, WhatsApp CTA\n  [05] Commercial / developer      — Investor-grade presentation`,
+  pricing: `Pricing structure:\n  Single page        →  from ₦40,000\n  Bundle (3 pages)   →  from ₦100,000\n  Monthly retainer   →  from ₦120,000/month\n  First page         →  FREE (qualified agents)\n\nAll prices negotiable for volume. DM to discuss.`,
+  turnaround: `Delivery timeline:\n  Standard page      →  24 hours\n  Complex page       →  48 hours\n  Bundle (3 pages)   →  72 hours\n  Retainer clients   →  priority queue always\n\nFast delivery is part of the service, not extra.`,
+  contact: `Transmission channels:\n  WhatsApp  →  +234 913 711 4631\n  Email     →  yusufeniola883@gmail .com\n  Base      →  Lagos, Nigeria\n\nBest channel: WhatsApp. I respond fast.`,
+  why: `Why property pages work:\n  — Buyers make decisions in the first 10 seconds\n  — Portal links look identical to 50 other listings\n  — A dedicated page signals: this agent is serious\n  — Direct lead capture = no middlemen taking your buyers\n  — Shareable link works everywhere: IG, WhatsApp, email\n  — One page can close a deal that 20 photos couldn't`,
+  clear: `__CLEAR__`,
+};
+const input = document.getElementById('cmd-input');
+const response = document.getElementById('cmd-response');
+input.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const val = input.value.trim().toLowerCase();
+    input.value='';
+    if(!val) return;
+    if(commands[val]){
+      if(commands[val]==='__CLEAR__'){response.style.display='none';response.textContent='';return;}
+      response.style.display='block';
+      response.textContent='';
+      const text = commands[val];
+      let i=0;
+      const type=()=>{if(i<text.length){response.textContent+=text[i++];setTimeout(type,12);}};
+      type();
+    } else {
+      response.style.display='block';
+      response.textContent=`Command not found: "${val}"\nType "help" for available commands.`;
+      response.style.color='#FF3B3B';
+      setTimeout(()=>{response.style.color='var(--acid)';},2000);
+    }
+  }
+});
+</script>
+</body>
+</html>
